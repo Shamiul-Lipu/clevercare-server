@@ -24,6 +24,62 @@ async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
+
+        const toyesCollection = client.db('cleverCareDB').collection('toys');
+
+        const indexkeys = { toy_name: 1 };
+        const indexOptions = { name: "toyName" };
+        const result = await toyesCollection.createIndex(indexkeys, indexOptions);
+
+        app.get('/all_toy_data/:text', async (req, res) => {
+            const searchText = req.params.text;
+            const cursor = req.body;
+            const limit = parseInt(req.query.limit) || 20;
+            console.log(req.query.limit);
+            const result = await toyesCollection.find({
+                $or: [{ toy_name: { $regex: searchText, $options: "i" } }]
+            }).limit(limit).toArray();
+            res.send(result)
+        })
+
+        // get all data with limit
+        app.get('/all_toy_data', async (req, res) => {
+            const cursor = req.body;
+            const limit = parseInt(req.query.limit) || 20;
+            console.log(req.query.limit);
+            const result = await toyesCollection.find().limit(limit).toArray();
+            res.send(result);
+        })
+
+        // for category
+        app.get('/all_toy', async (req, res) => {
+            let query = {};
+            if (req.query?.categoryName) {
+                query = { categoryName: req.query.categoryName }
+            }
+            const result = await toyesCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        // Insert data
+        app.post('/postToy', async (req, res) => {
+            const body = req.body;
+            const result = await toyesCollection.insertOne(body);
+            res.send(result);
+        })
+
+        // User's inserted toyes
+        app.get('/users_inserted_toy', async (req, res) => {
+            let query = {};
+            if (req.query?.seller_email) {
+                query = { seller_email: req.query.seller_email }
+            }
+            const result = await toyesCollection.find(query).toArray();
+            res.send(result);
+        })
+
+
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
