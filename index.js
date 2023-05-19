@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.lvuf5o9.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -46,7 +46,7 @@ async function run() {
         app.get('/all_toy_data', async (req, res) => {
             const cursor = req.body;
             const limit = parseInt(req.query.limit) || 20;
-            console.log(req.query.limit);
+            // console.log(req.query.limit);
             const result = await toyesCollection.find().limit(limit).toArray();
             res.send(result);
         })
@@ -57,7 +57,7 @@ async function run() {
             if (req.query?.categoryName) {
                 query = { categoryName: req.query.categoryName }
             }
-            const result = await toyesCollection.find(query).toArray();
+            const result = await toyesCollection.find(query).limit(12).toArray();
             res.send(result);
         })
 
@@ -78,6 +78,26 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/toy/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: new ObjectId(id) }
+            const data = await toyesCollection.findOne(filter)
+            res.send(data)
+        })
+
+        // Update User's toy
+        // app.put('/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const updateToys = req.body;
+        //     const filter = { _id: new ObjectId(id) };
+        //     const updateDoc = {
+        //         $set: {
+        //             ...updateToys
+        //         }
+        //     }
+        //     const result = await toyesCollection.updateOne(filter, updateDoc);
+        //     res.send(result);
+        // })
 
 
         // Send a ping to confirm a successful connection
