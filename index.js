@@ -35,7 +35,7 @@ async function run() {
             const searchText = req.params.text;
             const cursor = req.body;
             const limit = parseInt(req.query.limit) || 20;
-            console.log(req.query.limit);
+            // console.log("1", req.query);
             const result = await toyesCollection.find({
                 $or: [{ toy_name: { $regex: searchText, $options: "i" } }]
             }).limit(limit).toArray();
@@ -46,8 +46,19 @@ async function run() {
         app.get('/all_toy_data', async (req, res) => {
             const cursor = req.body;
             const limit = parseInt(req.query.limit) || 20;
-            // console.log(req.query.limit);
-            const result = await toyesCollection.find().limit(limit).toArray();
+            let setPrice;
+            const value = req.query.value || 'high';
+            if (value === 'high') {
+                setPrice = -1;
+                // console.log(1)
+            } else {
+                setPrice = 1;
+                // console.log(-1)
+            }
+            console.log("2line", req.query.value);
+            console.log(setPrice);
+
+            const result = await toyesCollection.find().sort({ price: setPrice }).limit(limit).toArray();
             res.send(result);
         })
 
