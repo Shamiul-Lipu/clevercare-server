@@ -55,8 +55,8 @@ async function run() {
                 setPrice = 1;
                 // console.log(-1)
             }
-            console.log("2line", req.query.value);
-            console.log(setPrice);
+            // console.log("2line", req.query.value);
+            // console.log(setPrice);
 
             const result = await toyesCollection.find().sort({ price: setPrice }).limit(limit).toArray();
             res.send(result);
@@ -97,18 +97,27 @@ async function run() {
         })
 
         // Update User's toy
-        // app.put('/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const updateToys = req.body;
-        //     const filter = { _id: new ObjectId(id) };
-        //     const updateDoc = {
-        //         $set: {
-        //             ...updateToys
-        //         }
-        //     }
-        //     const result = await toyesCollection.updateOne(filter, updateDoc);
-        //     res.send(result);
-        // })
+        app.patch('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateToys = req.body;
+            const filter = { _id: new ObjectId(id) };
+            // console.log(updateToys)
+            const updateDoc = {
+                $set: {
+                    ...updateToys
+                }
+            }
+            const result = await toyesCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+
+        // Delete toy
+        app.delete('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const result = await toyesCollection.deleteOne(filter);
+            res.send(result);
+        })
 
 
         // Send a ping to confirm a successful connection
