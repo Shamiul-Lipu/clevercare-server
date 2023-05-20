@@ -26,6 +26,7 @@ async function run() {
         await client.connect();
 
         const toyesCollection = client.db('cleverCareDB').collection('toys');
+        const coursesCollection = client.db('cleverCareDB').collection('courses');
 
         const indexkeys = { toy_name: 1 };
         const indexOptions = { name: "toyName" };
@@ -119,6 +120,12 @@ async function run() {
             res.send(result);
         })
 
+        // get courses
+        app.get('/courses', async (req, res) => {
+            const details = req.body;
+            const result = await coursesCollection.find().toArray();
+            res.send(result);
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
