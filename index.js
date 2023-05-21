@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -8,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.lvuf5o9.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -28,9 +29,9 @@ async function run() {
         const toyesCollection = client.db('cleverCareDB').collection('toys');
         const coursesCollection = client.db('cleverCareDB').collection('courses');
 
-        const indexkeys = { toy_name: 1 };
-        const indexOptions = { name: "toyName" };
-        const result = await toyesCollection.createIndex(indexkeys, indexOptions);
+        // const indexkeys = { toy_name: 1 };
+        // const indexOptions = { name: "toyName" };
+        // const result = await toyesCollection.createIndex(indexkeys, indexOptions);
 
         app.get('/all_toy_data/:text', async (req, res) => {
             const searchText = req.params.text;
@@ -51,14 +52,9 @@ async function run() {
             const value = req.query.value || 'high';
             if (value === 'high') {
                 setPrice = -1;
-                // console.log(1)
             } else {
                 setPrice = 1;
-                // console.log(-1)
             }
-            // console.log("2line", req.query.value);
-            // console.log(setPrice);
-
             const result = await toyesCollection.find().sort({ price: setPrice }).limit(limit).toArray();
             res.send(result);
         })
