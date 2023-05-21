@@ -86,7 +86,19 @@ async function run() {
             if (req.query?.seller_email) {
                 query = { seller_email: req.query.seller_email }
             }
-            const result = await toyesCollection.find(query).toArray();
+
+            const limit = parseInt(req.query.limit) || 20;
+            let setPrice;
+            const value = req.query.value || 'high';
+            if (value === 'high') {
+                setPrice = -1;
+                // console.log(1)
+            } else {
+                setPrice = 1;
+                // console.log(-1)
+            }
+
+            const result = await toyesCollection.find(query).sort({ price: setPrice }).toArray();
             res.send(result);
         })
 
